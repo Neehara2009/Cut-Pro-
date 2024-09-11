@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blur Your Image</title>
+    <style>
+        /* Reset styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #3498db;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        main {
+            flex: 1;
+            padding: 40px 20px;
+            max-width: 800px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .container {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        input[type="file"] {
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            box-sizing: border-box;
+        }
+
+        .preview-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            max-width: 100%;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            background: #3498db;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        footer {
+            background-color: #f1f1f1;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            color: #888;
+            box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.1);
+        }
+        /* Style for the menu icon */
+        .menu-icon {
+            font-size: 30px;
+            cursor: pointer;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1;
+        }
+
+        /* The sidebar menu */
+        .sidenav {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #111;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+        }
+
+        .sidenav a {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 25px;
+            color: #f1f1f1;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidenav a:hover {
+            color: #f1c40f;
+        }
+
+        .sidenav .closebtn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+        }
+
+        /* Style for the main content */
+        #main {
+            transition: margin-left .5s;
+            padding: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Blur Your Image</h1>
+    </header>
+    <!-- Menu Icon -->
+<div class="menu-icon" onclick="openNav()">&#9776;</div>
+
+<!-- Sidebar Menu -->
+<div id="mySidenav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a><br>
+    <a href="home.html">Home</a><br>
+    <a href="enhance.html">Enhance</a><br>
+    <a href="images-blur.html">Image blur</a><br>
+    <a href="ai-generator.html">Image Generating</a><br>
+    <a href="https://neehara2009.github.io/Cut-Pro/feedback.html">Feedback</a><br>
+    <a href="donate.html">Donate us</a><br>
+    <a href="index.html">Log Out</a><br>
+</div>
+
+    <main>
+        <div class="container">
+            <input type="file" id="upload" accept="image/*">
+            <div class="preview-container">
+                <canvas id="beforeCanvas" width="300" height="300"></canvas>
+                <canvas id="afterCanvas" width="300" height="300"></canvas>
+            </div>
+            <button id="download">Download Blurred Image</button>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Cut-Pro. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.getElementById('upload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const beforeCanvas = document.getElementById('beforeCanvas');
+                        const beforeCtx = beforeCanvas.getContext('2d');
+                        beforeCanvas.width = img.width;
+                        beforeCanvas.height = img.height;
+                        beforeCtx.drawImage(img, 0, 0, beforeCanvas.width, beforeCanvas.height);
+
+                        const afterCanvas = document.getElementById('afterCanvas');
+                        const afterCtx = afterCanvas.getContext('2d');
+                        afterCanvas.width = img.width;
+                        afterCanvas.height = img.height;
+                        
+                        // Apply the blur effect
+                        afterCtx.filter = 'blur(10px)';
+                        afterCtx.drawImage(img, 0, 0, afterCanvas.width, afterCanvas.height);
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('download').addEventListener('click', function() {
+            const afterCanvas = document.getElementById('afterCanvas');
+            const link = document.createElement('a');
+            link.download = 'blurred-image.png';
+            link.href = afterCanvas.toDataURL();
+            link.click();
+        });
+        /* Open the sidebar menu */
+        function openNav() {
+            document.getElementById("mySidenav").style.width = "250px";
+            document.getElementById("main").style.marginLeft = "250px";
+        }
+
+        /* Close the sidebar menu */
+        function closeNav() {
+            document.getElementById("mySidenav").style.width = "0";
+            document.getElementById("main").style.marginLeft = "0";
+        }
+    </script>
+</body>
+</html>
